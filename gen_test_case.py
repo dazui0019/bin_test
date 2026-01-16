@@ -36,6 +36,8 @@ def main():
         out.write("    POWER_ON 13.5 20.0\n")
         out.write("    WAIT 3\n")
         out.write("    READ CH4 TO $last_stable_val\n")
+        out.write("    WAIT 2\n")
+        out.write("    SCREENSHOT Init_Baseline\n")
         out.write("    # 初始检查: 假设开路电流为 2560mA (参考您的示例)\n")
         out.write("    CHECK_RANGE $last_stable_val 2560mA 5%\n")
         out.write("    RES_CLOSE\n")
@@ -74,6 +76,8 @@ def main():
                 out.write(f"    RES_SET {res}\n")
                 out.write("    WAIT 2\n")
                 out.write("    READ CH4 TO $current_val\n")
+                out.write("    WAIT 2\n")
+                out.write(f"    SCREENSHOT {test_id}_Step1\n")
                 
                 # 检查不变性: 与上一次稳定值相比，允许 100mA 波动 (防止测量噪声误判)
                 out.write("    CHECK_DIFF $current_val $last_stable_val 200mA\n")
@@ -83,12 +87,16 @@ def main():
                 out.write("    POWER_CYCLE\n")
                 out.write("    WAIT 3\n")
                 out.write("    READ CH4 TO $current_val\n")
+                out.write("    WAIT 2\n")
+                out.write(f"    SCREENSHOT {test_id}_Step2\n")
                 out.write(f"    CHECK_RANGE $current_val {total_current_ma:.1f}mA 5%\n")
                 
                 # 更新稳定值基准
                 out.write("    # 更新基准值 (增加等待以确保示波器采样稳定)\n")
                 out.write("    WAIT 2\n")
                 out.write("    READ CH4 TO $last_stable_val\n")
+                out.write("    WAIT 2\n")
+                out.write(f"    SCREENSHOT {test_id}_Baseline\n")
                 out.write("\n")
             
             case_idx += 1
