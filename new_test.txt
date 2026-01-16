@@ -1,7 +1,6 @@
 CONFIG RES_PORT COM11
 
 DEF_VAR $current_val
-DEF_VAR $last_val
 
 TEST Case_01 "初始上电测试"
     RES_OPEN

@@ -1,0 +1,670 @@
+# 自动生成的 BIN 电阻全遍历测试脚本
+# 源文件: res_list.txt
+# LED通道数: 44
+CONFIG RES_PORT COM11
+
+# 定义变量
+DEF_VAR $current_val
+DEF_VAR $last_stable_val
+
+# ==========================================
+TEST Case_Init "初始上电基准测试"
+    # 初始先确保电源关闭
+    POWER_OFF
+    # 确保电阻断开，测试默认开路电流
+    RES_OPEN
+    # 假设初始上电 13.5V 20A
+    POWER_ON 13.5 20.0
+    WAIT 3
+    READ CH4 TO $last_stable_val
+    # 初始检查: 假设开路电流为 2560mA (参考您的示例)
+    CHECK_RANGE $last_stable_val 2560mA 5%
+    RES_CLOSE
+
+# === 档位 1: 单路 30.0mA (总 1920.0mA) ===
+TEST Case_01_1 "档位1 R=2475Ω 期望1920.0mA"
+    # 步骤1: 调节电阻至 2475Ω，期望电流保持不变
+    RES_SET 2475
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 1920.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 1920.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_01_2 "档位1 R=2500Ω 期望1920.0mA"
+    # 步骤1: 调节电阻至 2500Ω，期望电流保持不变
+    RES_SET 2500
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 1920.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 1920.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_01_3 "档位1 R=2525Ω 期望1920.0mA"
+    # 步骤1: 调节电阻至 2525Ω，期望电流保持不变
+    RES_SET 2525
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 1920.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 1920.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 2: 单路 35.0mA (总 2240.0mA) ===
+TEST Case_02_1 "档位2 R=3127Ω 期望2240.0mA"
+    # 步骤1: 调节电阻至 3127Ω，期望电流保持不变
+    RES_SET 3127
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2240.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2240.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_02_2 "档位2 R=3158Ω 期望2240.0mA"
+    # 步骤1: 调节电阻至 3158Ω，期望电流保持不变
+    RES_SET 3158
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2240.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2240.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_02_3 "档位2 R=3189Ω 期望2240.0mA"
+    # 步骤1: 调节电阻至 3189Ω，期望电流保持不变
+    RES_SET 3189
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2240.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2240.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 3: 单路 40.0mA (总 2560.0mA) ===
+TEST Case_03_1 "档位3 R=3850Ω 期望2560.0mA"
+    # 步骤1: 调节电阻至 3850Ω，期望电流保持不变
+    RES_SET 3850
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2560.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2560.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_03_2 "档位3 R=3889Ω 期望2560.0mA"
+    # 步骤1: 调节电阻至 3889Ω，期望电流保持不变
+    RES_SET 3889
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2560.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2560.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_03_3 "档位3 R=3926Ω 期望2560.0mA"
+    # 步骤1: 调节电阻至 3926Ω，期望电流保持不变
+    RES_SET 3926
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2560.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2560.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 4: 单路 45.0mA (总 2880.0mA) ===
+TEST Case_04_1 "档位4 R=4657Ω 期望2880.0mA"
+    # 步骤1: 调节电阻至 4657Ω，期望电流保持不变
+    RES_SET 4657
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2880.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2880.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_04_2 "档位4 R=4706Ω 期望2880.0mA"
+    # 步骤1: 调节电阻至 4706Ω，期望电流保持不变
+    RES_SET 4706
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2880.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2880.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_04_3 "档位4 R=4754Ω 期望2880.0mA"
+    # 步骤1: 调节电阻至 4754Ω，期望电流保持不变
+    RES_SET 4754
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 2880.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2880.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 5: 单路 50.0mA (总 3200.0mA) ===
+TEST Case_05_1 "档位5 R=5568Ω 期望3200.0mA"
+    # 步骤1: 调节电阻至 5568Ω，期望电流保持不变
+    RES_SET 5568
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3200.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3200.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_05_2 "档位5 R=5625Ω 期望3200.0mA"
+    # 步骤1: 调节电阻至 5625Ω，期望电流保持不变
+    RES_SET 5625
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3200.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3200.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_05_3 "档位5 R=5681Ω 期望3200.0mA"
+    # 步骤1: 调节电阻至 5681Ω，期望电流保持不变
+    RES_SET 5681
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3200.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3200.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 6: 单路 55.0mA (总 3520.0mA) ===
+TEST Case_06_1 "档位6 R=6599Ω 期望3520.0mA"
+    # 步骤1: 调节电阻至 6599Ω，期望电流保持不变
+    RES_SET 6599
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3520.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3520.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_06_2 "档位6 R=6667Ω 期望3520.0mA"
+    # 步骤1: 调节电阻至 6667Ω，期望电流保持不变
+    RES_SET 6667
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3520.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3520.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_06_3 "档位6 R=6733Ω 期望3520.0mA"
+    # 步骤1: 调节电阻至 6733Ω，期望电流保持不变
+    RES_SET 6733
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3520.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3520.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 7: 单路 60.0mA (总 3840.0mA) ===
+TEST Case_07_1 "档位7 R=7776Ω 期望3840.0mA"
+    # 步骤1: 调节电阻至 7776Ω，期望电流保持不变
+    RES_SET 7776
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3840.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3840.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_07_2 "档位7 R=7857Ω 期望3840.0mA"
+    # 步骤1: 调节电阻至 7857Ω，期望电流保持不变
+    RES_SET 7857
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3840.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3840.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_07_3 "档位7 R=7938Ω 期望3840.0mA"
+    # 步骤1: 调节电阻至 7938Ω，期望电流保持不变
+    RES_SET 7938
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 3840.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 3840.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 8: 单路 65.0mA (总 4160.0mA) ===
+TEST Case_08_1 "档位8 R=9138Ω 期望4160.0mA"
+    # 步骤1: 调节电阻至 9138Ω，期望电流保持不变
+    RES_SET 9138
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4160.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4160.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_08_2 "档位8 R=9231Ω 期望4160.0mA"
+    # 步骤1: 调节电阻至 9231Ω，期望电流保持不变
+    RES_SET 9231
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4160.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4160.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_08_3 "档位8 R=9323Ω 期望4160.0mA"
+    # 步骤1: 调节电阻至 9323Ω，期望电流保持不变
+    RES_SET 9323
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4160.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4160.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 9: 单路 70.0mA (总 4480.0mA) ===
+TEST Case_09_1 "档位9 R=10725Ω 期望4480.0mA"
+    # 步骤1: 调节电阻至 10725Ω，期望电流保持不变
+    RES_SET 10725
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4480.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4480.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_09_2 "档位9 R=10833Ω 期望4480.0mA"
+    # 步骤1: 调节电阻至 10833Ω，期望电流保持不变
+    RES_SET 10833
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4480.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4480.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_09_3 "档位9 R=10942Ω 期望4480.0mA"
+    # 步骤1: 调节电阻至 10942Ω，期望电流保持不变
+    RES_SET 10942
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4480.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4480.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 10: 单路 75.0mA (总 4800.0mA) ===
+TEST Case_10_1 "档位10 R=12597Ω 期望4800.0mA"
+    # 步骤1: 调节电阻至 12597Ω，期望电流保持不变
+    RES_SET 12597
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4800.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4800.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_10_2 "档位10 R=12727Ω 期望4800.0mA"
+    # 步骤1: 调节电阻至 12727Ω，期望电流保持不变
+    RES_SET 12727
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4800.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4800.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_10_3 "档位10 R=12859Ω 期望4800.0mA"
+    # 步骤1: 调节电阻至 12859Ω，期望电流保持不变
+    RES_SET 12859
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 4800.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 4800.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 11: 单路 80.0mA (总 5120.0mA) ===
+TEST Case_11_1 "档位11 R=14851Ω 期望5120.0mA"
+    # 步骤1: 调节电阻至 14851Ω，期望电流保持不变
+    RES_SET 14851
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5120.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5120.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_11_2 "档位11 R=15000Ω 期望5120.0mA"
+    # 步骤1: 调节电阻至 15000Ω，期望电流保持不变
+    RES_SET 15000
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5120.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5120.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_11_3 "档位11 R=15151Ω 期望5120.0mA"
+    # 步骤1: 调节电阻至 15151Ω，期望电流保持不变
+    RES_SET 15151
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5120.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5120.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 12: 单路 85.0mA (总 5440.0mA) ===
+TEST Case_12_1 "档位12 R=17601Ω 期望5440.0mA"
+    # 步骤1: 调节电阻至 17601Ω，期望电流保持不变
+    RES_SET 17601
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5440.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5440.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_12_2 "档位12 R=17778Ω 期望5440.0mA"
+    # 步骤1: 调节电阻至 17778Ω，期望电流保持不变
+    RES_SET 17778
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5440.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5440.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_12_3 "档位12 R=17956Ω 期望5440.0mA"
+    # 步骤1: 调节电阻至 17956Ω，期望电流保持不变
+    RES_SET 17956
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5440.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5440.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 13: 单路 90.0mA (总 5760.0mA) ===
+TEST Case_13_1 "档位13 R=21034Ω 期望5760.0mA"
+    # 步骤1: 调节电阻至 21034Ω，期望电流保持不变
+    RES_SET 21034
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5760.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5760.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_13_2 "档位13 R=21250Ω 期望5760.0mA"
+    # 步骤1: 调节电阻至 21250Ω，期望电流保持不变
+    RES_SET 21250
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5760.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5760.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_13_3 "档位13 R=21469Ω 期望5760.0mA"
+    # 步骤1: 调节电阻至 21469Ω，期望电流保持不变
+    RES_SET 21469
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 5760.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 5760.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 14: 单路 95.0mA (总 6080.0mA) ===
+TEST Case_14_1 "档位14 R=25463Ω 期望6080.0mA"
+    # 步骤1: 调节电阻至 25463Ω，期望电流保持不变
+    RES_SET 25463
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 6080.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 6080.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_14_2 "档位14 R=25714Ω 期望6080.0mA"
+    # 步骤1: 调节电阻至 25714Ω，期望电流保持不变
+    RES_SET 25714
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 6080.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 6080.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_14_3 "档位14 R=25970Ω 期望6080.0mA"
+    # 步骤1: 调节电阻至 25970Ω，期望电流保持不变
+    RES_SET 25970
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 6080.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 6080.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# === 档位 15: 单路 100.0mA (总 6400.0mA) ===
+TEST Case_15_1 "档位15 R=31362Ω 期望6400.0mA"
+    # 步骤1: 调节电阻至 31362Ω，期望电流保持不变
+    RES_SET 31362
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 6400.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 6400.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_15_2 "档位15 R=31667Ω 期望6400.0mA"
+    # 步骤1: 调节电阻至 31667Ω，期望电流保持不变
+    RES_SET 31667
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 6400.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 6400.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+TEST Case_15_3 "档位15 R=31978Ω 期望6400.0mA"
+    # 步骤1: 调节电阻至 31978Ω，期望电流保持不变
+    RES_SET 31978
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_DIFF $current_val $last_stable_val 200mA
+    # 步骤2: 重启电源，期望电流变为 6400.0mA
+    POWER_CYCLE
+    WAIT 3
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 6400.0mA 5%
+    # 更新基准值
+    READ CH4 TO $last_stable_val
+
+# 测试结束
+POWER_OFF

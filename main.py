@@ -16,6 +16,12 @@ PATH_YOKOGAWA = os.path.join("yokogawa", "yokogawa.py")
 # 解释器
 PYTHON_EXE = sys.executable
 
+# ANSI 颜色码
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    RESET = '\033[0m'
+
 class TestRunner:
     def __init__(self):
         self.variables = {}  # 用于存储变量: {"$val_1": 0.5, ...}
@@ -38,14 +44,35 @@ class TestRunner:
             self.failed_tests.append(f"{self.current_test_id} ({self.current_test_title})")
 
     def run_external_tool(self, cmd_list, desc):
-        """执行外部 Python 工具"""
+        """执行外部 Python 工具 (支持 Ctrl+C 中断)"""
+        process = None
         try:
-            result = subprocess.run(cmd_list, capture_output=True, text=True)
-            if result.returncode != 0:
-                self.error(f"工具执行失败 [{desc}]: {result.stderr.strip()}")
+            # 使用 Popen 以便我们可以控制子进程
+            process = subprocess.Popen(
+                cmd_list, 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.PIPE, 
+                text=True,
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
+            )
+            
+            stdout, stderr = process.communicate()
+            
+            if process.returncode != 0:
+                self.error(f"工具执行失败 [{desc}]: {stderr.strip()}")
                 return None
-            return result.stdout.strip()
+            return stdout.strip()
+
+        except KeyboardInterrupt:
+            # 如果在等待子进程时按下 Ctrl+C
+            if process:
+                print(f"\n[系统] 正在终止子进程: {desc} ...")
+                process.kill() # 强制杀死子进程
+            raise # 重新抛出异常，让外层的 run() 捕获并执行紧急断电
+
         except Exception as e:
+            if process:
+                process.kill()
             self.error(f"系统异常 [{desc}]: {e}")
             return None
 
@@ -266,9 +293,9 @@ class TestRunner:
             upper = expect_val + tol_abs
 
             if lower <= real_val <= upper:
-                self.log(f"PASS: {args[0]}({real_val:.4f}) 在范围 [{lower:.4f}, {upper:.4f}] 内")
+                self.log(f"{Colors.GREEN}PASS{Colors.RESET}: {args[0]}({real_val:.4f}) 在范围 [{lower:.4f}, {upper:.4f}] 内")
             else:
-                self.error(f"FAIL: {args[0]}({real_val:.4f}) 超出范围 [{lower:.4f}, {upper:.4f}] (期望: {args[1]} ±{args[2]})")
+                self.error(f"{Colors.RED}FAIL{Colors.RESET}: {args[0]}({real_val:.4f}) 超出范围 [{lower:.4f}, {upper:.4f}] (期望: {args[1]} ±{args[2]})")
 
         except Exception as e:
             self.error(f"CHECK_RANGE 执行异常: {e}")
@@ -282,9 +309,9 @@ class TestRunner:
             diff = abs(val_a - val_b)
 
             if diff <= max_diff:
-                self.log(f"PASS: 差异 {diff:.4f} <= 允许值 {max_diff:.4f}")
+                self.log(f"{Colors.GREEN}PASS{Colors.RESET}: 差异 {diff:.4f} <= 允许值 {max_diff:.4f}")
             else:
-                self.error(f"FAIL: 差异 {diff:.4f} > 允许值 {max_diff:.4f}")
+                self.error(f"{Colors.RED}FAIL{Colors.RESET}: 差异 {diff:.4f} > 允许值 {max_diff:.4f}")
 
         except Exception as e:
             self.error(f"CHECK_DIFF 执行异常: {e}")
@@ -351,10 +378,10 @@ class TestRunner:
         if self.failed_tests:
             print(f"测试完成，存在失败用例 ({len(self.failed_tests)}个):")
             for t in self.failed_tests:
-                print(f" - {t}")
+                print(f" - {Colors.RED}{t}{Colors.RESET}")
             sys.exit(1)
         else:
-            print("所有测试执行完毕，结果: PASS")
+            print(f"所有测试执行完毕，结果: {Colors.GREEN}PASS{Colors.RESET}")
             sys.exit(0)
 
 if __name__ == "__main__":
