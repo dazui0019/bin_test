@@ -86,7 +86,8 @@ def main():
                 out.write(f"    CHECK_RANGE $current_val {total_current_ma:.1f}mA 5%\n")
                 
                 # 更新稳定值基准
-                out.write("    # 更新基准值\n")
+                out.write("    # 更新基准值 (增加等待以确保示波器采样稳定)\n")
+                out.write("    WAIT 2\n")
                 out.write("    READ CH4 TO $last_stable_val\n")
                 out.write("\n")
             

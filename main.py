@@ -392,7 +392,13 @@ class TestRunner:
         duration = end_time - start_time
         
         timestamp_str = end_time.strftime("%Y%m%d_%H%M%S")
-        report_file = f"test_report_{timestamp_str}.md"
+        
+        # 创建 result 目录
+        result_dir = "result"
+        if not os.path.exists(result_dir):
+            os.makedirs(result_dir)
+            
+        report_file = os.path.join(result_dir, f"test_report_{timestamp_str}.md")
         
         total = len(self.test_results)
         passed = sum(1 for t in self.test_results if t["result"] == "PASS")
