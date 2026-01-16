@@ -1,0 +1,9 @@
+[submodule "power_ctrl"]
+	path = power_ctrl
+	url = git@github.com:dazui0019/power_ctrl.git
+[submodule "yokogawa"]
+	path = yokogawa
+	url = git@github.com:dazui0019/yokogawa.git
+[submodule "res_ctrl"]
+	path = res_ctrl
+	url = git@github.com:dazui0019/res_ctrl.git
