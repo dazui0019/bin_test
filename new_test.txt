@@ -1,0 +1,22 @@
+CONFIG RES_PORT COM11
+
+DEF_VAR $current_val
+DEF_VAR $last_val
+
+TEST Case_01 "初始上电测试"
+    RES_OPEN
+    POWER_ON 13.5 20.0
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2560mA 5%
+    RES_CLOSE
+TEST Case_02 "TI 档位1测试"
+    RES_SET 2475
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 2560mA 5%
+    POWER_CYCLE 13.5 20.0
+    WAIT 2
+    READ CH4 TO $current_val
+    CHECK_RANGE $current_val 1920mA 5%
+    POWER_OFF

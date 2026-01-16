@@ -1,0 +1,96 @@
+# BIN电流档位自动化测试序列
+# ==========================================
+
+# --- 全局配置 ---
+# 如果不指定，工具会尝试自动搜索，但建议在此显式指定以提高稳定性
+CONFIG RES_PORT COM11
+
+# --- 测试用例 1: 初始上电 ---
+TEST CHCM-1C-2C1V-1-17025 "LB 初始上电测试"
+    # 步骤 1: 使能LB (上电 12V 2A), 测量电流
+    POWER_ON 12.0 2.0
+    WAIT 2
+    
+    # 读取电流并存入 $val_init
+    READ CH4 TO $val_init
+    
+    # 验证: 1000mA ±5%
+    CHECK_RANGE $val_init 1000mA 5%
+
+# --- 测试用例 2: 区间1亮度 ---
+TEST CHCM-1C-2C1V-1-17026 "LB 区间1亮度"
+    # 记录当前状态作为基准 (调节前)
+    READ CH4 TO $base_1
+    
+    # 步骤 1: 调节电阻为 537Ω
+    RES_SET 537
+    WAIT 1
+    READ CH4 TO $val_537
+    # 验证: 电流不变 (相对于 $base_1 变化小于 50mA)
+    CHECK_DIFF $val_537 $base_1 50mA
+
+    # 步骤 2: LDM 下电再上电 (重启)
+    POWER_CYCLE
+    WAIT 2
+    READ CH4 TO $val_pwr_cycle_1
+    # 验证: 电流变为 700mA ±5%
+    CHECK_RANGE $val_pwr_cycle_1 700mA 5%
+
+    # 步骤 3: 调节电阻为 638Ω
+    # 以调节前的状态 ($val_pwr_cycle_1) 为基准
+    RES_SET 638
+    WAIT 1
+    READ CH4 TO $val_638
+    # 验证: 电流不变
+    CHECK_DIFF $val_638 $val_pwr_cycle_1 50mA
+
+    # 步骤 4: 重启
+    POWER_CYCLE
+    WAIT 2
+    READ CH4 TO $val_pwr_cycle_2
+    # 验证: 700mA
+    CHECK_RANGE $val_pwr_cycle_2 700mA 5%
+
+    # 步骤 5: 调节电阻为 737Ω
+    RES_SET 737
+    WAIT 1
+    READ CH4 TO $val_737
+    # 验证: 电流不变 (相对于 $val_pwr_cycle_2)
+    CHECK_DIFF $val_737 $val_pwr_cycle_2 50mA
+
+    # 步骤 6: 重启
+    POWER_CYCLE
+    WAIT 2
+    READ CH4 TO $val_pwr_cycle_3
+    # 验证: 700mA
+    CHECK_RANGE $val_pwr_cycle_3 700mA 5%
+
+# --- 测试用例 3: 区间2亮度 ---
+TEST CHCM-1C-2C1V-1-17027 "LB 区间2亮度"
+    # 步骤 1: 调节电阻为 1009Ω
+    # 注意: 这里假设是接着上一个用例跑的，保持通电状态。
+    # 我们可以先读一个基准，或者直接调节。通常调节前读基准更稳健。
+    READ CH4 TO $base_2
+    
+    RES_SET 1009
+    WAIT 1
+    READ CH4 TO $val_1009
+    # 验证: 电流不变
+    CHECK_DIFF $val_1009 $base_2 50mA
+
+    # 步骤 2: 重启
+    POWER_CYCLE
+    WAIT 2
+    READ CH4 TO $val_pwr_cycle_4
+    # 验证: 730mA
+    CHECK_RANGE $val_pwr_cycle_4 730mA 5%
+
+    # 步骤 3: 调节电阻为 1111Ω
+    RES_SET 1111
+    WAIT 1
+    READ CH4 TO $val_1111
+    # 验证: 电流不变 (相对于 $val_pwr_cycle_4)
+    CHECK_DIFF $val_1111 $val_pwr_cycle_4 50mA
+
+# 测试结束，关闭电源
+POWER_OFF
