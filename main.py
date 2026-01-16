@@ -167,6 +167,7 @@ class TestRunner:
             "id": self.current_test_id,
             "title": self.current_test_title,
             "result": "PASS",
+            "resistance": "-",
             "expected": [],
             "actual": [],
             "note": ""
@@ -224,6 +225,9 @@ class TestRunner:
 
         self.run_external_tool(cmd, f"设置电阻 {val}")
         self.log(f"电阻设置为: {val}")
+
+        if self.current_test_data:
+            self.current_test_data["resistance"] = val
 
     def cmd_res_open(self, args):
         # RES_OPEN
@@ -447,8 +451,8 @@ class TestRunner:
             f.write(f"| {total} | {passed} | {failed} |\n\n")
             
             f.write("## 2. 📝 详细记录\n\n")
-            f.write("| ID | 标题 | 结果 | 预期值 | 实测值 | 备注 |\n")
-            f.write("| :--- | :--- | :---: | :--- | :--- | :--- |\n")
+            f.write("| ID | 标题 | 结果 | 电阻 | 预期值 | 实测值 | 备注 |\n")
+            f.write("| :--- | :--- | :---: | :---: | :--- | :--- | :--- |\n")
             
             for t in self.test_results:
                 icon = "✅ PASS" if t["result"] == "PASS" else "🔴 FAIL"
@@ -457,8 +461,9 @@ class TestRunner:
                 expected_str = "<br>".join(t["expected"]) if t["expected"] else "-"
                 actual_str = "<br>".join(t["actual"]) if t["actual"] else "-"
                 note_str = t["note"].strip().replace("|", "\\|") # 转义表格符
+                res_val = t.get("resistance", "-")
                 
-                f.write(f"| {t['id']} | {t['title']} | {icon} | {expected_str} | {actual_str} | {note_str} |\n")
+                f.write(f"| {t['id']} | {t['title']} | {icon} | {res_val} | {expected_str} | {actual_str} | {note_str} |\n")
                 
         print(f"\n[Report] 测试报告已生成: {report_file}")
 
