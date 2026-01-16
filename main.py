@@ -244,6 +244,33 @@ class TestRunner:
         self.run_external_tool(cmd, "闭合电阻 (CLOSE)")
         self.log("电阻已闭合 (CLOSE)")
 
+    def cmd_screenshot(self, args):
+        # SCREENSHOT [Label]
+        label = args[0] if len(args) > 0 else "snap"
+        
+        # 确保 result/screen_shot 目录存在
+        result_dir = os.path.join("result", "screen_shot")
+        if not os.path.exists(result_dir):
+            os.makedirs(result_dir)
+            
+        # 生成文件名: CaseID_Label_时间戳.png
+        timestamp = datetime.datetime.now().strftime("%H%M%S")
+        filename = f"{self.current_test_id}_{label}_{timestamp}.png"
+        filepath = os.path.join(result_dir, filename)
+        
+        cmd = [PYTHON_EXE, PATH_YOKOGAWA, "shot", "-o", filepath]
+        if self.config["SCOPE_IP"]:
+            cmd.extend(["--ip", self.config["SCOPE_IP"]])
+            
+        self.run_external_tool(cmd, f"截图 {filename}")
+        self.log(f"截图已保存: {filepath}")
+        
+        # 记录到报告中
+        if self.current_test_data:
+            # 报告在 result/ 根目录，图片在 result/screen_shot/
+            img_link = f"![{label}](screen_shot/{filename})"
+            self.current_test_data["note"] += f"{img_link} "
+
     def cmd_wait(self, args):
         sec = float(args[0])
         self.log(f"等待 {sec} 秒...")
@@ -372,6 +399,7 @@ class TestRunner:
         elif cmd == "RES_SET": self.cmd_res_set(args)
         elif cmd == "RES_OPEN": self.cmd_res_open(args)
         elif cmd == "RES_CLOSE": self.cmd_res_close(args)
+        elif cmd == "SCREENSHOT": self.cmd_screenshot(args)
         elif cmd == "WAIT": self.cmd_wait(args)
         elif cmd == "READ": self.cmd_read(args)
         elif cmd == "SET_VAR": self.cmd_set_var(args)

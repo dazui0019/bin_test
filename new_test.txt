@@ -17,5 +17,7 @@ TEST Case_02 "TI 档位1测试"
     POWER_CYCLE 13.5 20.0
     WAIT 2
     READ CH4 TO $current_val
+    WAIT 2
+    SCREENSHOT
     CHECK_RANGE $current_val 1920mA 5%
     POWER_OFF
