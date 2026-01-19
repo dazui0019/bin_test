@@ -34,11 +34,6 @@ class TestRunner:
         }
         self.failed_tests = []
         
-        # 测试报告数据结构
-        # { "id": "Case_01", "title": "Title", "result": "PASS", "expected": [], "actual": [], "note": "" }
-        self.test_results = []
-        self.current_test_data = None
-        
         self.current_test_id = "N/A"
         self.current_test_title = ""
 
@@ -51,13 +46,6 @@ class TestRunner:
         if self.current_test_id not in self.failed_tests:
             self.failed_tests.append(f"{self.current_test_id} ({self.current_test_title})")
         
-        # 更新当前测试用例状态
-        if self.current_test_data:
-            self.current_test_data["result"] = "FAIL"
-            # 避免重复追加太多的错误信息
-            if msg not in self.current_test_data["note"]:
-                self.current_test_data["note"] += f"{msg}; "
-
     def run_external_tool(self, cmd_list, desc):
         """执行外部 Python 工具 (支持 Ctrl+C 中断)"""
         process = None
@@ -155,23 +143,8 @@ class TestRunner:
         self.log(f"配置更新: {key} = {value}")
 
     def cmd_test(self, args):
-        # 保存上一个测试用例
-        if self.current_test_data:
-            self.test_results.append(self.current_test_data)
-            
         self.current_test_id = args[0]
         self.current_test_title = " ".join(args[1:]).strip('"')
-        
-        # 初始化新用例数据
-        self.current_test_data = {
-            "id": self.current_test_id,
-            "title": self.current_test_title,
-            "result": "PASS",
-            "resistance": "-",
-            "expected": [],
-            "actual": [],
-            "note": ""
-        }
         
         print(f"\n{'='*60}")
         print(f"测试用例: {self.current_test_id} - {self.current_test_title}")
@@ -226,9 +199,6 @@ class TestRunner:
         self.run_external_tool(cmd, f"设置电阻 {val}")
         self.log(f"电阻设置为: {val}")
 
-        if self.current_test_data:
-            self.current_test_data["resistance"] = val
-
     def cmd_res_open(self, args):
         # RES_OPEN
         cmd = [PYTHON_EXE, PATH_RES_CTRL, "--action", "disconnect"]
@@ -269,12 +239,6 @@ class TestRunner:
         self.run_external_tool(cmd, f"截图 {filename}")
         self.log(f"截图已保存: {filepath}")
         
-        # 记录到报告中
-        if self.current_test_data:
-            # 报告在 result/ 根目录，图片在 result/screen_shot/
-            img_link = f"![{label}](screen_shot/{filename})"
-            self.current_test_data["note"] += f"{img_link} "
-
     def cmd_wait(self, args):
         sec = float(args[0])
         self.log(f"等待 {sec} 秒...")
@@ -353,11 +317,6 @@ class TestRunner:
             lower = expect_val - tol_abs
             upper = expect_val + tol_abs
             
-            # 记录数据
-            if self.current_test_data:
-                self.current_test_data["expected"].append(f"[{lower:.4f}, {upper:.4f}]")
-                self.current_test_data["actual"].append(f"{real_val:.4f}")
-
             if lower <= real_val <= upper:
                 self.log(f"{Colors.GREEN}PASS{Colors.RESET}: {args[0]}({real_val:.4f}) 在范围 [{lower:.4f}, {upper:.4f}] 内")
             else:
@@ -374,11 +333,6 @@ class TestRunner:
 
             diff = abs(val_a - val_b)
             
-            # 记录数据
-            if self.current_test_data:
-                self.current_test_data["expected"].append(f"Diff <= {max_diff:.4f}")
-                self.current_test_data["actual"].append(f"{diff:.4f}")
-
             if diff <= max_diff:
                 self.log(f"{Colors.GREEN}PASS{Colors.RESET}: 差异 {diff:.4f} <= 允许值 {max_diff:.4f}")
             else:
@@ -411,65 +365,7 @@ class TestRunner:
         elif cmd == "CHECK_DIFF": self.cmd_check_diff(args)
         else: self.error(f"未知指令: {cmd}")
 
-    def generate_report(self, start_time):
-        """生成 Markdown 测试报告"""
-        # 确保最后一个用例被添加
-        if self.current_test_data and self.current_test_data not in self.test_results:
-            self.test_results.append(self.current_test_data)
-            
-        if not self.test_results:
-            return
-
-        end_time = datetime.datetime.now()
-        duration = end_time - start_time
-        
-        timestamp_str = end_time.strftime("%Y%m%d_%H%M%S")
-        
-        # 创建 result 目录
-        result_dir = "result"
-        if not os.path.exists(result_dir):
-            os.makedirs(result_dir)
-            
-        report_file = os.path.join(result_dir, f"test_report_{timestamp_str}.md")
-        
-        total = len(self.test_results)
-        passed = sum(1 for t in self.test_results if t["result"] == "PASS")
-        failed = total - passed
-        
-        overall_result = "PASS" if failed == 0 else "FAIL"
-        overall_icon = "✅" if failed == 0 else "🔴"
-        
-        with open(report_file, "w", encoding="utf-8") as f:
-            f.write(f"# 📄 BIN 自动化测试报告\n\n")
-            f.write(f"- **测试时间**: `{end_time.strftime('%Y-%m-%d %H:%M:%S')}`\n")
-            f.write(f"- **总体结果**: {overall_icon} **{overall_result}**\n")
-            f.write(f"- **耗时**: `{duration}`\n\n")
-            
-            f.write("## 1. 📊 统计\n\n")
-            f.write(f"| 总用例 | ✅ 通过 | 🔴 失败 |\n")
-            f.write(f"| :---: | :---: | :---: |\n")
-            f.write(f"| {total} | {passed} | {failed} |\n\n")
-            
-            f.write("## 2. 📝 详细记录\n\n")
-            f.write("| ID | 标题 | 结果 | 电阻 | 预期值 | 实测值 | 备注 |\n")
-            f.write("| :--- | :--- | :---: | :---: | :--- | :--- | :--- |\n")
-            
-            for t in self.test_results:
-                icon = "✅ PASS" if t["result"] == "PASS" else "🔴 FAIL"
-                
-                # 处理多行显示 (如果一个Case有多个Check)
-                expected_str = "<br>".join(t["expected"]) if t["expected"] else "-"
-                actual_str = "<br>".join(t["actual"]) if t["actual"] else "-"
-                note_str = t["note"].strip().replace("|", "\\|") # 转义表格符
-                res_val = t.get("resistance", "-")
-                
-                f.write(f"| {t['id']} | {t['title']} | {icon} | {res_val} | {expected_str} | {actual_str} | {note_str} |\n")
-                
-        print(f"\n[Report] 测试报告已生成: {report_file}")
-
     def run(self):
-        start_time = datetime.datetime.now()
-        
         # 解析命令行参数
         parser = argparse.ArgumentParser(description="自动化测试执行器")
         parser.add_argument("file", nargs="?", default=DEFAULT_SEQUENCE_FILE, help="测试序列文件路径")
@@ -497,18 +393,14 @@ class TestRunner:
             print("\n\n!!! 检测到用户中断 (Ctrl+C) !!!")
             print("正在紧急关闭电源...")
             self.cmd_power_off([]) # 强制关闭电源
-            self.generate_report(start_time) # 即使中断也生成报告
             sys.exit(130)
         except Exception as e:
             print(f"\n\n[FATAL] 发生未捕获异常: {e}")
             print("尝试紧急关闭电源...")
             self.cmd_power_off([])
-            self.generate_report(start_time) # 异常退出也生成报告
             sys.exit(1)
 
         # 正常结束
-        self.generate_report(start_time)
-
         print("\n" + "="*60)
         if self.failed_tests:
             print(f"测试完成，存在失败用例 ({len(self.failed_tests)}个):")
