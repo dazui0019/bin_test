@@ -1,74 +1,96 @@
-# BIN 电流档位自动化测试
+# Current Verification Test Script
 
-本项目包含用于 BIN 电流档位自动化测试的脚本工具，主要由测试执行器 (`main.py`) 和用例生成器 (`gen_test_case.py`) 组成。
+此脚本 (`test_current_verification.py`) 用于自动化测试设备的电流验证流程。它通过控制电阻箱、电源和示波器，验证在不同电阻设置下，设备的工作电流是否符合预期。
 
-## 目录结构
+## 功能介绍
 
-- `main.py`: **核心测试执行器**，负责解析测试指令并控制硬件。
-- `gen_test_case.py`: **测试用例生成器**，根据电阻列表生成全遍历测试脚本。
-- `test_script.txt` / `full_test_script.txt`: 测试脚本文件（指令集）。
-- `res_list.txt`: 生成器的输入文件，定义了电阻组合和期望电流。
-- `power_ctrl/`: 电源控制工具（子模块）。
-- `res_ctrl/`: 电阻箱控制工具（子模块）。
-- `yokogawa/`: 示波器读取工具（子模块）。
+*   **自动化测试流程**：自动设置电阻 -> 重启电源 -> 等待稳定 -> 读取示波器电流值 -> 判定结果。
+*   **灵活的测试范围**：
+    *   支持指定测试某个档位 (`--level`) 或所有档位 (`--all`)。
+    *   支持仅测试典型值 (默认) 或全范围测试 (最小值/典型值/最大值, `--full-range`)。
+*   **硬件控制**：通过调用现有的 CLI 脚本 (`resistance_cli.py`, `power_ctrl_cli.py`, `yokogawa_pyvisa.py`) 间接控制硬件，无需直接占用设备连接。
+*   **结果记录**：自动将测试结果保存为 CSV 文件至 `./results/` 目录，包含详细的测量数据和 PASS/FAIL 判定。
+*   **安全清理**：测试结束或中断后，自动关闭电源并断开电阻箱。
 
-## 1. 测试执行器 (main.py)
+## 依赖文件
 
-`main.py` 是自动化测试的核心引擎，它读取文本格式的测试脚本，解析指令并调用底层的 Python 工具来控制硬件（电源、电阻箱、示波器）。
+*   `signal_res_list.txt`: 配置文件，定义了每个档位的电阻值（Min, Typ, Max）和预期电流值。
+*   `res_ctrl/resistance_cli.py`: 电阻箱控制脚本。
+*   `power_ctrl/power_ctrl_cli.py`: 电源控制脚本。
+*   `yokogawa/yokogawa_pyvisa.py`: 示波器控制脚本。
 
-### 用法
+## 使用方法
 
-```bash
-# 执行默认测试脚本 (test_script.txt)
-python main.py
+### 基本用法
 
-# 执行指定测试脚本
-python main.py full_test_script.txt
-```
-
-### 核心特性
-
-- **指令驱动**：支持易读的文本指令（如 `POWER_ON`, `RES_SET`, `CHECK_RANGE`）。
-- **安全保护**：支持 `Ctrl+C` 中断，中断时会自动执行紧急断电操作。
-- **结果可视化**：终端输出支持颜色高亮（绿色 PASS，红色 FAIL）。
-- **变量支持**：支持定义变量 (`DEF_VAR`)、读取存储 (`READ ... TO ...`) 和数值运算。
-- **全局配置**：支持通过 `CONFIG` 指令动态配置串口号和设备地址。
-
-### 常用指令示例
-
-```text
-CONFIG RES_PORT COM3        # 配置电阻箱串口
-DEF_VAR $limit 0.5          # 定义变量
-POWER_ON 12.0 2.0           # 电源上电 12V 2A
-RES_SET 100                 # 设置电阻 100Ω
-WAIT 2                      # 等待 2 秒
-READ CH4 TO $val            # 读取示波器 CH4 到变量 $val
-CHECK_RANGE $val 0.5 10%    # 检查 $val 是否在 0.5±10% 范围内
-POWER_OFF                   # 电源下电
-```
-
-## 2. 测试用例生成器 (gen_test_case.py)
-
-`gen_test_case.py` 用于批量生成测试用例。它读取 `res_list.txt` 中的电阻组合，生成包含完整控制逻辑的测试脚本文件 `full_test_script.txt`。
-
-### 用法
-
-1.  编辑 `res_list.txt`，每行格式为：`R1, R2, R3, 单路电流(mA)`。
-2.  运行生成脚本：
+1.  **测试指定档位 (例如档位 1)**
     ```bash
-    python gen_test_case.py
+    uv run test_current_verification.py --level 1
     ```
-3.  生成的脚本 `full_test_script.txt` 可直接由 `main.py` 执行。
 
-### 生成逻辑
+2.  **测试所有档位**
+    ```bash
+    uv run test_current_verification.py --all
+    ```
 
-- **初始状态**：生成 `Case_Init`，确保初始先执行 `POWER_OFF` 和 `RES_OPEN`，确立安全基准。
-- **循环测试**：针对每一行配置，生成设置电阻、检查稳定性、重启电源、检查目标电流的完整流程。
-- **变量追踪**：自动使用变量 (`$last_stable_val`) 追踪上一次的稳定值，用于 `CHECK_DIFF` 校验，防止异常跳变。
+3.  **全范围测试 (Min, Typ, Max)**
+    测试档位 1 的所有电阻点：
+    ```bash
+    uv run test_current_verification.py --level 1 --full-range
+    ```
 
-## 快速开始
+4.  **指定示波器通道**
+    使用通道 2 进行测量：
+    ```bash
+    uv run test_current_verification.py --level 1 -c 2
+    ```
 
-1.  确认硬件连接（电源、电阻箱、示波器）。
-2.  在脚本中或通过 `CONFIG` 指令配置正确的串口号 (COM口)。
-3.  运行 `python gen_test_case.py` 生成最新测试用例。
-4.  运行 `python main.py full_test_script.txt` 开始测试。
+5.  **不保存结果**
+    仅在终端显示，不生成 CSV 文件：
+    ```bash
+    uv run test_current_verification.py --level 1 --no-save
+    ```
+
+### 参数说明
+
+*   `--level ID`: 指定测试的档位 ID。
+*   `--all`: 测试配置文件中的所有档位。
+*   `--full-range`: 测试电阻的 Min, Typ, Max 三个值（默认仅测试 Typ）。
+*   `--tolerance PCT`: 允许的误差百分比（默认 5%）。
+*   `-c`, `--scope-channel`: 示波器测量通道（默认 1）。
+*   `--no-save`: 不保存结果文件。
+*   `--res-port`: 电阻箱串口端口（默认 `/dev/ttyUSB0`）。
+*   `--scope-ip` / `--scope-serial`: 示波器连接参数。
+*   `--power-addr`: 电源 VISA 地址。
+
+## 代码执行逻辑
+
+脚本的主要执行流程如下：
+
+1.  **初始化**：
+    *   解析命令行参数。
+    *   读取 `signal_res_list.txt` 配置文件。
+    *   创建 `./results/` 目录（如果不存在）并初始化 CSV 结果文件。
+
+2.  **测试循环**：
+    *   遍历配置文件中的每个条目（根据 `--level` 或 `--all` 筛选）。
+    *   确定测试点（仅 Typ 或 Min/Typ/Max）。
+    *   **步骤 A: 设置电阻**
+        *   调用 `resistance_cli.py` 将电阻箱设置为目标值。
+    *   **步骤 B: 电源重启**
+        *   调用 `power_ctrl_cli.py` 关闭电源。
+        *   等待 1 秒。
+        *   调用 `power_ctrl_cli.py` 打开电源。
+        *   等待 3 秒（让被测设备初始化并稳定电流）。
+    *   **步骤 C: 测量电流**
+        *   调用 `yokogawa_pyvisa.py` 读取示波器指定通道的平均值 (`mean`)。
+    *   **步骤 D: 结果判定**
+        *   计算测量值与预期值的误差百分比。
+        *   如果误差小于 `--tolerance`，判定为 **PASS**，否则为 **FAIL**。
+    *   **步骤 E: 记录**
+        *   将数据写入 CSV 文件并在终端打印。
+
+3.  **清理 (Cleanup)**：
+    *   无论测试成功完成还是被用户中断 (Ctrl+C)，都会执行清理步骤。
+    *   **关闭电源**：确保设备断电。
+    *   **断开电阻**：将电阻箱设为 OPEN 状态。
